@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebAR 3D Model - Image Tracking (Smooth)</title>
+
+  <!-- โหลด Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
+
+  <!-- โหลด GLTFLoader -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/js/loaders/GLTFLoader.js"></script>
+
+  <!-- โหลด MindAR -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #ar-container { width: 100vw; height: 100vh; position: relative; }
+    #loading {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="ar-container">
+    <div id="loading">Loading AR...</div>
+  </div>
+
+  <script>
+    const start = async () => {
+      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+        container: document.querySelector("#ar-container"),
+        imageTargetSrc: "https://chomromsin.github.io/armodel/targets.mind", // Marker target
+      });
+
+      const { renderer, scene, camera } = mindarThree;
+
+      // เพิ่มแสง
+      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      scene.add(light);
+
+      // สร้าง anchor
+      const anchor = mindarThree.addAnchor(0);
+
+      // ตัวแปรที่ใช้เก็บ model และตำแหน่งเป้าหมาย
+      let model;
+      const targetPosition = new THREE.Vector3();
+      const targetQuaternion = new THREE.Quaternion();
+
+      // โหลดโมเดล
+      const loader = new THREE.GLTFLoader();
+      loader.load("https://chomromsin.github.io/armodel/test.glb", (gltf) => {
+        model = gltf.scene;
+        model.scale.set(0.5, 0.5, 0.5);
+        model.position.set(0, 0, 0);
+        anchor.group.add(model);
+      }, undefined, (error) => {
+        console.error('Error loading GLB model:', error);
+      });
+
+      // เริ่ม AR session
+      await mindarThree.start();
+      document.getElementById('loading').style.display = 'none';
+
+      // Render loop
+      renderer.setAnimationLoop(() => {
+        if (model && anchor.group.visible) {
+          // อัปเดตเป้าหมายตำแหน่ง และการหมุน
+          anchor.group.getWorldPosition(targetPosition);
+          anchor.group.getWorldQuaternion(targetQuaternion);
+
+          // เคลื่อนและหมุนแบบนิ่ม ๆ
+          model.position.lerp(targetPosition, 0.2);
+          model.quaternion.slerp(targetQuaternion, 0.2);
+        }
+
+        renderer.render(scene, camera);
+      });
+    }
+    start();
+  </script>
+</body>
+</html>
