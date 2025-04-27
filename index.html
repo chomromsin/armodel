@@ -31,18 +31,17 @@
       const start = async () => {
         const mindarThree = new window.MINDAR.IMAGE.MindARThree({
           container: document.querySelector("#ar-container"),
-          imageTargetSrc: "https://chomromsin.github.io/armodel/targets.mind",
+          imageTargetSrc: "https://chomromsin.github.io/armodel/targets.mind", // ใช้แค่ไฟล์นี้
         });
 
         const { renderer, scene, camera } = mindarThree;
 
         const anchor = mindarThree.addAnchor(0); // target แรก
 
-        // โหลดโมเดล .glb
         const loader = new GLTFLoader();
         loader.load("https://chomromsin.github.io/armodel/test.glb", (gltf) => {
-          gltf.scene.scale.set(0.5, 0.5, 0.5); // ปรับขนาดโมเดล
-          gltf.scene.position.set(0, 0, 0);    // ปรับตำแหน่ง (กลาง marker)
+          gltf.scene.scale.set(0.5, 0.5, 0.5);
+          gltf.scene.position.set(0, 0, 0);
           anchor.group.add(gltf.scene);
         });
 
