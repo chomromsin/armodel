@@ -1,56 +1,75 @@
-<html>
-  <head>
-    <title>WebAR 3D Model - Image Tracking</title>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
-    <style>
-      body { margin: 0; overflow: hidden; }
-      #ar-container { width: 100vw; height: 100vh; position: relative; }
-      #loading {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: white;
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-      }
-    </style>
-  </head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebAR 3D Model - Image Tracking</title>
 
-  <body>
-    <div id="ar-container">
-      <div id="loading">Loading AR...</div>
-    </div>
+  <!-- โหลด Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
 
-    <script>
-      const start = async () => {
-        const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-          container: document.querySelector("#ar-container"),
-          imageTargetSrc: "https://chomromsin.github.io/armodel/targets.mind",
-        });
+  <!-- โหลด GLTFLoader -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/js/loaders/GLTFLoader.js"></script>
 
-        const { renderer, scene, camera } = mindarThree;
+  <!-- โหลด MindAR -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
 
-        const anchor = mindarThree.addAnchor(0);
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #ar-container { width: 100vw; height: 100vh; position: relative; }
+    #loading {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
 
-        const loader = new THREE.GLTFLoader();
-        loader.load("https://chomromsin.github.io/armodel/test.glb", (gltf) => {
-          gltf.scene.scale.set(0.5, 0.5, 0.5);
-          gltf.scene.position.set(0, 0, 0);
-          anchor.group.add(gltf.scene);
-        });
+<body>
+  <div id="ar-container">
+    <div id="loading">Loading AR...</div>
+  </div>
 
-        await mindarThree.start();
-        document.getElementById('loading').style.display = 'none';
-        renderer.setAnimationLoop(() => {
-          renderer.render(scene, camera);
-        });
-      }
-      start();
-    </script>
-  </body>
+  <script>
+    const start = async () => {
+      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+        container: document.querySelector("#ar-container"),
+        imageTargetSrc: "https://chomromsin.github.io/armodel/targets.mind", // ไฟล์ marker ที่ฝากบน GitHub
+      });
+
+      const { renderer, scene, camera } = mindarThree;
+
+      // เพิ่มแสงให้ 3D model สว่าง
+      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      scene.add(light);
+
+      const anchor = mindarThree.addAnchor(0);
+
+      // โหลด 3D โมเดล
+      const loader = new THREE.GLTFLoader();
+      loader.load("https://chomromsin.github.io/armodel/test.glb", (gltf) => {
+        gltf.scene.scale.set(0.2, 0.2, 0.2); // ปรับขนาดโมเดล
+        gltf.scene.position.set(0, 0, 0);     // วางโมเดลที่จุดกลาง
+        anchor.group.add(gltf.scene);
+      }, undefined, (error) => {
+        console.error('Error loading GLB model:', error);
+      });
+
+      // เริ่มต้น AR session
+      await mindarThree.start();
+      document.getElementById('loading').style.display = 'none';
+
+      // Render loop
+      renderer.setAnimationLoop(() => {
+        renderer.render(scene, camera);
+      });
+    }
+    start();
+  </script>
+</body>
 </html>
