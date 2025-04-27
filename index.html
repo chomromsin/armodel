@@ -1,15 +1,29 @@
 <html>
   <head>
+    <title>WebAR 3D Model - Image Tracking</title>
     <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
     <style>
       body { margin: 0; overflow: hidden; }
       #ar-container { width: 100vw; height: 100vh; position: relative; }
+      #loading {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: white;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+      }
     </style>
   </head>
 
   <body>
-    <div id="ar-container"></div>
+    <div id="ar-container">
+      <div id="loading">Loading AR...</div>
+    </div>
 
     <script type="module">
       import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.143.0/examples/jsm/loaders/GLTFLoader.js';
@@ -17,21 +31,23 @@
       const start = async () => {
         const mindarThree = new window.MINDAR.IMAGE.MindARThree({
           container: document.querySelector("#ar-container"),
-          imageTargetSrc: "./targets.mind",
+          imageTargetSrc: "https://chomromsin.github.io/armodel/targets.mind",
         });
 
         const { renderer, scene, camera } = mindarThree;
 
-        const anchor = mindarThree.addAnchor(0); // target ที่ 0
+        const anchor = mindarThree.addAnchor(0); // target แรก
 
         // โหลดโมเดล .glb
         const loader = new GLTFLoader();
-        loader.load("./test.glb", (gltf) => {
+        loader.load("https://chomromsin.github.io/armodel/test.glb", (gltf) => {
           gltf.scene.scale.set(0.5, 0.5, 0.5); // ปรับขนาดโมเดล
+          gltf.scene.position.set(0, 0, 0);    // ปรับตำแหน่ง (กลาง marker)
           anchor.group.add(gltf.scene);
         });
 
         await mindarThree.start();
+        document.getElementById('loading').style.display = 'none';
         renderer.setAnimationLoop(() => {
           renderer.render(scene, camera);
         });
