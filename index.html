@@ -2,6 +2,7 @@
   <head>
     <title>WebAR 3D Model - Image Tracking</title>
     <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
     <style>
       body { margin: 0; overflow: hidden; }
@@ -25,20 +26,18 @@
       <div id="loading">Loading AR...</div>
     </div>
 
-    <script type="module">
-      import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.143.0/examples/jsm/loaders/GLTFLoader.js';
-
+    <script>
       const start = async () => {
         const mindarThree = new window.MINDAR.IMAGE.MindARThree({
           container: document.querySelector("#ar-container"),
-          imageTargetSrc: "https://chomromsin.github.io/armodel/targets.mind", // ใช้แค่ไฟล์นี้
+          imageTargetSrc: "https://chomromsin.github.io/armodel/targets.mind",
         });
 
         const { renderer, scene, camera } = mindarThree;
 
-        const anchor = mindarThree.addAnchor(0); // target แรก
+        const anchor = mindarThree.addAnchor(0);
 
-        const loader = new GLTFLoader();
+        const loader = new THREE.GLTFLoader();
         loader.load("https://chomromsin.github.io/armodel/test.glb", (gltf) => {
           gltf.scene.scale.set(0.5, 0.5, 0.5);
           gltf.scene.position.set(0, 0, 0);
