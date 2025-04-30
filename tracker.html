@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <title>WebAR 3D</title>
 
-  <!-- GLTFLoader -->
+  <!-- ✅ Load THREE.js before anything else -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
+  <!-- ✅ Load GLTFLoader AFTER THREE is defined -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/js/loaders/GLTFLoader.js"></script>
-
-  <!-- MindAR (includes Three.js inside already) -->
+  <!-- ✅ Load MindAR (must be after THREE is defined) -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
 
   <style>
