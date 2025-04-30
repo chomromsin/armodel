@@ -1,15 +1,13 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>WebAR 3D Model</title>
-
-  <!-- Three.js -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>WebAR 3D</title>
 
   <!-- GLTFLoader -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/js/loaders/GLTFLoader.js"></script>
 
-  <!-- MindAR -->
+  <!-- MindAR (includes Three.js inside already) -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
 
   <style>
@@ -29,7 +27,6 @@
     }
   </style>
 </head>
-
 <body>
   <div id="ar-container">
     <div id="loading">Loading AR...</div>
@@ -44,13 +41,13 @@
 
       const { renderer, scene, camera } = mindarThree;
 
-      // Add light
+      // Light
       const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
       scene.add(light);
 
       const anchor = mindarThree.addAnchor(0);
 
-      // Variables for smoothing
+      // Smoothing
       let model;
       const targetPosition = new THREE.Vector3();
       const targetQuaternion = new THREE.Quaternion();
@@ -61,21 +58,20 @@
         model.scale.set(0.5, 0.5, 0.5);
         model.position.set(0, 0, 0);
         anchor.group.add(model);
+      }, undefined, (err) => {
+        console.error("Failed to load model:", err);
       });
 
       await mindarThree.start();
-      document.getElementById('loading').style.display = 'none';
+      document.getElementById("loading").style.display = "none";
 
-      // Render loop with smoothing
       renderer.setAnimationLoop(() => {
         if (model && anchor.group.visible) {
-          // Get the target position/rotation from anchor
           anchor.group.getWorldPosition(targetPosition);
           anchor.group.getWorldQuaternion(targetQuaternion);
 
-          // Smooth move
-          model.position.lerp(targetPosition, 0.2); // Move 20% toward target
-          model.quaternion.slerp(targetQuaternion, 0.2); // Rotate 20% toward target
+          model.position.lerp(targetPosition, 0.2);
+          model.quaternion.slerp(targetQuaternion, 0.2);
         }
 
         renderer.render(scene, camera);
