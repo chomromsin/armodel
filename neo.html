@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>WebAR Model Viewer</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        background: #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      h1 { font-family: sans-serif; }
+      model-viewer { width: 100%; height: 500px; }
+      #controls, #model-switcher {
+        margin: 10px;
+        text-align: center;
+      }
+      button {
+        margin: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: none;
+        background: #4CAF50;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #45a049;
+      }
+      /* ปุ่มที่ active */
+      .active {
+        background: #2196F3;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>🚀 LUXEBIDET AR Model Viewer</h1>
+
+    <!-- ปุ่มควบคุม -->
+    <div id="controls">
+      <button onclick="setAutoRotate(true)">Auto Rotate</button>
+      <button onclick="setAutoRotate(false)">Stop Rotate</button>
+      <button onclick="enableCameraControls()">Manual Rotate</button>
+      <button onclick="disableCameraControls()">Lock View</button>
+    </div>
+
+    <!-- ปุ่มเลือกโมเดล -->
+    <div id="model-switcher">
+      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet.glb')" class="active">Model 01</button>
+      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet-02.glb')">Model 02</button>
+      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet-03.glb')">Model 03</button>
+      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet-04.glb')">Model 04</button>
+    </div>
+
+    <!-- viewer -->
+    <model-viewer 
+      id="modelViewer"
+      src="https://chomromsin.github.io/armodel/Luxebidet.glb"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      camera-controls 
+      auto-rotate
+      exposure="1.8"
+      shadow-intensity="1"
+      environment-image="HDRI.hdr"
+      style="background: white; width: 100%; height: 800px;">
+    </model-viewer>
+
+    <script>
+      const viewer = document.getElementById('modelViewer');
+      const buttons = document.querySelectorAll('#model-switcher button');
+
+      function setAutoRotate(enable) {
+        viewer.autoRotate = enable;
+      }
+
+      function enableCameraControls() {
+        viewer.cameraControls = true;
+      }
+
+      function disableCameraControls() {
+        viewer.cameraControls = false;
+      }
+
+      // ฟังก์ชันเปลี่ยนโมเดล + highlight ปุ่ม active
+      function switchModel(button, url) {
+        viewer.src = url;
+
+        // ลบ active จากปุ่มทั้งหมด
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // ใส่ active ที่ปุ่มที่กด
+        button.classList.add('active');
+      }
+    </script>
+  </body>
+</html>
