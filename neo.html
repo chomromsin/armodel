@@ -36,11 +36,42 @@
       .active {
         background: #2196F3;
       }
+		
+	/* ปุ่มเลือกโมเดล */
+#model-switcher button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 2px solid #1565c0;   /* กรอบน้ำเงินเข้ม */
+  background: linear-gradient(145deg, #2196F3, #64b5f6);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+#model-switcher button:hover {
+  background: linear-gradient(145deg, #1976d2, #42a5f5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.25);
+}
+
+#model-switcher button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ปุ่ม active สำหรับเลือกโมเดล */
+#model-switcher .active {
+  background: linear-gradient(145deg, #0d47a1, #1e88e5);
+  border-color: #0d47a1;
+}	
     </style>
   </head>
 
   <body>
-    <h1>🚀 LUXEBIDET AR Model Viewer</h1>
+    <h1>🚀NEO 120 AR Viewer</h1>
 
     <!-- ปุ่มควบคุม -->
     <div id="controls">
@@ -52,10 +83,10 @@
 
     <!-- ปุ่มเลือกโมเดล -->
     <div id="model-switcher">
-      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet.glb')" class="active">Model 01</button>
-      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet-02.glb')">Model 02</button>
-      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet-03.glb')">Model 03</button>
-      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet-04.glb')">Model 04</button>
+      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet.glb')" class="active">120 Blue</button>
+      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet-02.glb')">120 Rose Gold</button>
+      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet-03.glb')">120 Gold</button>
+      <button onclick="switchModel(this, 'https://chomromsin.github.io/armodel/Luxebidet-04.glb')">120 White</button>
     </div>
 
     <!-- viewer -->
