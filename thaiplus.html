@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>คำนวณ 60:40</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+    }
+    h2 {
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    .result {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f4f4f4;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>คำนวณ 60:40</h2>
+
+  <label>เงินที่เราจ่าย (บาท)</label>
+  <input type="number" id="userPay" placeholder="เช่น 68" oninput="calc()">
+
+  <div class="result">
+    <p>รัฐออกให้: <span id="govPay">0</span> บาท</p>
+    <p>ราคารวม: <span id="total">0</span> บาท</p>
+  </div>
+
+  <script>
+    function calc() {
+      let user = parseFloat(document.getElementById("userPay").value) || 0;
+
+      let gov = user * 1.5;
+      let total = user + gov;
+
+      document.getElementById("govPay").innerText = gov.toFixed(2);
+      document.getElementById("total").innerText = total.toFixed(2);
+    }
+  </script>
+
+</body>
+</html>
