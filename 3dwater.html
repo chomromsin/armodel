@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Water Reflection & Ripple</title>
+  <style>
+    html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#000; }
+    #info { position:fixed; top:18px; left:18px; color:white; font-family:Arial,sans-serif; z-index:10;
+      background:rgba(0,0,0,.35); padding:10px 14px; border-radius:12px; backdrop-filter: blur(8px); }
+  </style>
+</head>
+<body>
+<div id="info">3D Water • Reflection • Ripple<br>ลากเมาส์เพื่อสร้างคลื่น</div>
+
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+import { Water } from 'https://unpkg.com/three@0.160.0/examples/jsm/objects/Water.js';
+import { Sky } from 'https://unpkg.com/three@0.160.0/examples/jsm/objects/Sky.js';
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,1,20000);
+camera.position.set(0,120,260);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(devicePixelRatio);
+document.body.appendChild(renderer.domElement);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enablePan=false; controls.maxPolarAngle=Math.PI*0.49;
+
+const waterGeometry=new THREE.PlaneGeometry(10000,10000);
+const water=new Water(waterGeometry,{
+ textureWidth:512,
+ textureHeight:512,
+ waterNormals:new THREE.TextureLoader().load('https://threejs.org/examples/textures/waternormals.jpg', t=>{t.wrapS=t.wrapT=THREE.RepeatWrapping;}),
+ sunDirection:new THREE.Vector3(),
+ sunColor:0xffffff,
+ waterColor:0x0a6fb8,
+ distortionScale:4,
+ fog:false
+});
+water.rotation.x=-Math.PI/2;
+scene.add(water);
+
+const sky=new Sky(); sky.scale.setScalar(10000); scene.add(sky);
+const sun=new THREE.Vector3();
+const uniforms=sky.material.uniforms;
+uniforms['turbidity'].value=8;
+uniforms['rayleigh'].value=2;
+uniforms['mieCoefficient'].value=0.005;
+uniforms['mieDirectionalG'].value=0.8;
+const phi=THREE.MathUtils.degToRad(88);
+const theta=THREE.MathUtils.degToRad(180);
+sun.setFromSphericalCoords(1,phi,theta);
+uniforms['sunPosition'].value.copy(sun);
+water.material.uniforms['sunDirection'].value.copy(sun).normalize();
+
+const ripples=[];
+const mouse=new THREE.Vector2();
+const raycaster=new THREE.Raycaster();
+const rippleGeo=new THREE.RingGeometry(1.5,2,64);
+
+window.addEventListener('pointermove',(e)=>{
+ mouse.x=(e.clientX/innerWidth)*2-1;
+ mouse.y=-(e.clientY/innerHeight)*2+1;
+ raycaster.setFromCamera(mouse,camera);
+ const hit=raycaster.intersectObject(water);
+ if(hit.length){
+   const m=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.35,side:THREE.DoubleSide});
+   const ring=new THREE.Mesh(rippleGeo,m);
+   ring.rotation.x=-Math.PI/2;
+   ring.position.copy(hit[0].point);
+   ring.scale.setScalar(1);
+   scene.add(ring);
+   ripples.push(ring);
+ }
+});
+
+function animate(){
+ requestAnimationFrame(animate);
+ water.material.uniforms['time'].value += 1/90;
+ ripples.forEach((r,i)=>{
+   r.scale.multiplyScalar(1.03);
+   r.material.opacity*=0.97;
+   if(r.material.opacity<0.02){scene.remove(r); ripples.splice(i,1);} 
+ });
+ controls.update();
+ renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener('resize',()=>{
+ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+});
+</script>
+</body>
+</html>
