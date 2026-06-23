@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Water - GitHub Pages Ready</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#000;}
+#label{position:fixed;left:20px;top:20px;color:#fff;font-family:Arial;background:rgba(0,0,0,.35);padding:10px 14px;border-radius:12px;z-index:2}
+canvas{display:block}
+</style>
+</head>
+<body>
+<div id="label">3D Water • Reflection • Cursor Ripple</div>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Water } from 'three/addons/objects/Water.js';
+import { Sky } from 'three/addons/objects/Sky.js';
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,1,20000);
+camera.position.set(0,100,220);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(innerWidth,innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const controls=new OrbitControls(camera, renderer.domElement);
+controls.enablePan=false; controls.maxPolarAngle=Math.PI*0.48;
+
+const water=new Water(new THREE.PlaneGeometry(10000,10000),{
+textureWidth:512, textureHeight:512,
+waterNormals:new THREE.TextureLoader().load('https://threejs.org/examples/textures/waternormals.jpg',t=>{t.wrapS=t.wrapT=THREE.RepeatWrapping;}),
+sunDirection:new THREE.Vector3(), sunColor:0xffffff, waterColor:0x0a75c2,
+distortionScale:3.7,fog:false
+});
+water.rotation.x=-Math.PI/2; scene.add(water);
+
+const sky=new Sky(); sky.scale.setScalar(10000); scene.add(sky);
+const sun=new THREE.Vector3();
+const u=sky.material.uniforms;
+u.turbidity.value=8;u.rayleigh.value=2;u.mieCoefficient.value=0.005;u.mieDirectionalG.value=0.8;
+sun.setFromSphericalCoords(1,THREE.MathUtils.degToRad(88),THREE.MathUtils.degToRad(180));
+u.sunPosition.value.copy(sun);
+water.material.uniforms.sunDirection.value.copy(sun).normalize();
+
+const raycaster=new THREE.Raycaster(); const mouse=new THREE.Vector2(); const ripples=[];
+const geo=new THREE.RingGeometry(1.2,1.8,64);
+window.addEventListener('pointermove',e=>{
+ mouse.x=(e.clientX/innerWidth)*2-1; mouse.y=-(e.clientY/innerHeight)*2+1;
+ raycaster.setFromCamera(mouse,camera);
+ const hit=raycaster.intersectObject(water);
+ if(hit.length){
+  const mat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.35,side:THREE.DoubleSide});
+  const ring=new THREE.Mesh(geo,mat); ring.rotation.x=-Math.PI/2; ring.position.copy(hit[0].point);
+  scene.add(ring); ripples.push(ring);
+ }
+});
+
+function animate(){
+ requestAnimationFrame(animate);
+ water.material.uniforms.time.value += 1/70;
+ for(let i=ripples.length-1;i>=0;i--){const r=ripples[i]; r.scale.multiplyScalar(1.03); r.material.opacity*=0.97; if(r.material.opacity<0.02){scene.remove(r); ripples.splice(i,1);}}
+ controls.update(); renderer.render(scene,camera);
+}
+animate();
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+</script>
+</body>
+</html>
